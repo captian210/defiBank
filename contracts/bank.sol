@@ -70,7 +70,13 @@ contract DeFiBank is ERC20 {
 
     }
 
-
+    /* 
+    @dev 
+    
+    interest is a function of available liquidity and the size 
+    of the user's loan proportional to total amount loaned out 
+     
+    */
     function viewLoanAmount() public view returns (uint) {
 
         uint availableLiquidity = deposited - lended;
@@ -89,7 +95,7 @@ contract DeFiBank is ERC20 {
 
     }
 
-
+    // @dev this function regulates the rate at which the interest increases
     function continuousInterest(uint interest) private view returns (uint) {
 
         uint t1 = loans[msg.sender].time;
