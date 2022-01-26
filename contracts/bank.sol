@@ -6,6 +6,7 @@ import "./ERC20/ERC20.sol";
 contract DeFiBank is ERC20 {
 
     uint public deposited;
+
     uint public lended;
 
     uint public dividends;
@@ -22,22 +23,27 @@ contract DeFiBank is ERC20 {
     mapping(address => loan) public loans;
 
     mapping(address => uint256) public deposits;
+
     mapping(address => uint256) private released;
 
 
     function provideLiquidity() public payable {
+
         deposits[msg.sender] += msg.value;
+
         deposited += msg.value;
 
         _mint(msg.sender, msg.value);
 
     }
 
+
     function getLoan(uint amount) public {
 
         require(amount <= deposited);
 
         loans[msg.sender].amount = amount;
+
         loans[msg.sender].time = block.timestamp;
 
         lended += amount;
@@ -46,22 +52,20 @@ contract DeFiBank is ERC20 {
 
     }
 
+
+    // @dev currently loan must be paid in full
     function payLoan() public payable {
 
         // @dev simple interest 
-
-
-
-
-
-        uint availableLiquidity = deposited - lended;
-        uint payment = (deposited * loans[msg.sender].amount) / availableLiquidity;
+        
+        uint payment = viewLoanAmount();
 
         require(msg.value >= payment);
 
-        dividends += payment - loans[msg.sender].amount;
+        dividends += msg.value - loans[msg.sender].amount;
 
         lended -= loans[msg.sender].amount;
+
         loans[msg.sender].amount -= loans[msg.sender].amount;
 
     }
@@ -89,6 +93,7 @@ contract DeFiBank is ERC20 {
     function continuousInterest(uint interest) private view returns (uint) {
 
         uint t1 = loans[msg.sender].time;
+
         uint t2 = block.timestamp;
 
         uint time = t2 - t1;
@@ -106,6 +111,7 @@ contract DeFiBank is ERC20 {
         require(deposits[msg.sender] >= amount);
 
         deposits[msg.sender] -= amount;
+
         deposited -= amount;
 
         _burn(msg.sender, amount);
@@ -116,14 +122,17 @@ contract DeFiBank is ERC20 {
 
 
     function withdrawEarnings () public virtual {
+
         require(deposits[msg.sender] > 0, "PaymentSplitter: account has no deposits");
 
         uint256 totalReceived = dividends + totalReleased;
+
         uint256 payment = (totalReceived * deposits[msg.sender]) / deposited - released[msg.sender];
 
         require(payment != 0, "PaymentSplitter: account is not due payment");
 
         released[msg.sender] += payment;
+
         totalReleased += payment;
 
         payable(msg.sender).transfer(payment);
