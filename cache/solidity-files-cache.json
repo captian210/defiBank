@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/home/ubuntu/Desktop/defiBank/contracts/bank.sol": {
-      "lastModificationDate": 1643200903776,
-      "contentHash": "29014ce05a3cdca8d9cbfc32c59c16f7",
+      "lastModificationDate": 1643201145826,
+      "contentHash": "03146683425f4a8b3d0888524ed9a698",
       "sourceName": "contracts/bank.sol",
       "solcConfig": {
         "version": "0.8.7",

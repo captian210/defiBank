@@ -70,7 +70,16 @@ contract DeFiBank is ERC20 {
     function viewLoanAmount() public view returns (uint) {
 
         uint availableLiquidity = deposited - lended;
-        uint payment = (deposited * loans[msg.sender].amount) / availableLiquidity;
+
+        uint _loan = loans[msg.sender].amount;
+
+        uint payment = (deposited * _loan) / availableLiquidity;
+
+        uint interest = payment - _loan;
+
+        uint interestC = continuousInterest(interest);
+
+        payment += interestC;
 
         return payment;
 
