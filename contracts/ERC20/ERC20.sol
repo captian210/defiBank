@@ -21,133 +21,85 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/4c8642b70aad
 
 
 contract ERC20 is Context, IERC20, IERC20Metadata {
+    mapping(address => uint256) private _balances;
 
-    mapping(address => uint256) public _balances;
+    mapping(address => mapping(address => uint256)) private _allowances;
 
-    mapping(address => mapping(address => uint256)) public _allowances;
-    
-    uint256 public _totalSupply;
+    uint256 private _totalSupply;
 
     string private _name;
     string private _symbol;
     
-    
-    event PayeeAdded(address account, uint256 shares);
-    event PaymentReleased(address to, uint256 amount);
-    event PaymentReceived(address from, uint256 amount);
-    
-    
-    uint256 public _totalReleased;
-    
-    mapping(address => uint256) public _released;
-    address[] public _payees;
-    
-    
+
     // hardcoded the constructor for faster development... more warnings but its ok for now... 1B supply
-    string name_ = "DAO token";
-    string symbol_ = "xDAO";
-    uint supply = 1000000000000000000000000000;
-    address[] payees = [0x5B38Da6a701c568545dCfcB03FcB875f56beddC4];
-    uint256[] amount= [1000000000000000000000000000];
-    
+    string name_ = "Riemann Token";
+    string symbol_ = "rTOK";
+    uint supply = 0;
 
-    constructor(
-        
-        /**
-        string memory name_, 
-        string memory symbol_, 
-        uint supply,
-        address[] memory payees, 
-        uint256[] memory amount) payable {
-        */
-
-        ) {
-
+    constructor() {
         _name = name_;
         _symbol = symbol_;
         _mint(msg.sender, supply);
-        require(payees.length == amount.length, "PaymentSplitter: payees and shares length mismatch");
-        require(payees.length > 0, "PaymentSplitter: no payees");
-        
-        for (uint256 i = 0; i < payees.length; i++) {
-            _addPayee(payees[i], amount[i]);
-        }
-      
     }
-    
-
-    // this function is for the dividend payout functionality 
-    function _addPayee(address account, uint256 amount) private {
-        require(account != address(0), "PaymentSplitter: account is the zero address");
-        require(amount > 0, "PaymentSplitter: shares are 0");
-        /** require(_balances[account] == 0, "PaymentSplitter: account already has shares"); **/
-
-        _payees.push(account);
-        _balances[account] = amount;
-        
-        emit PayeeAdded(account, amount);
-    }
-
 
     function name() public view virtual override returns (string memory) {
         return _name;
     }
-    
+
 
     function symbol() public view virtual override returns (string memory) {
         return _symbol;
     }
-    
+
 
     function decimals() public view virtual override returns (uint8) {
         return 18;
     }
-    
+
 
     function totalSupply() public view virtual override returns (uint256) {
         return _totalSupply;
     }
-    
-    
+
+  
     function balanceOf(address account) public view virtual override returns (uint256) {
         return _balances[account];
     }
-    
 
     function transfer(address recipient, uint256 amount) public virtual override returns (bool) {
         _transfer(_msgSender(), recipient, amount);
         return true;
     }
 
-
     function allowance(address owner, address spender) public view virtual override returns (uint256) {
         return _allowances[owner][spender];
     }
-    
 
     function approve(address spender, uint256 amount) public virtual override returns (bool) {
         _approve(_msgSender(), spender, amount);
         return true;
     }
-    
-    
+
+
     function transferFrom(
         address sender,
         address recipient,
         uint256 amount
     ) public virtual override returns (bool) {
-        _transfer(sender, recipient, amount);
-
         uint256 currentAllowance = _allowances[sender][_msgSender()];
-        require(currentAllowance >= amount, "ERC20: transfer amount exceeds allowance");
-        unchecked {
-            _approve(sender, _msgSender(), currentAllowance - amount);
+        if (currentAllowance != type(uint256).max) {
+            require(currentAllowance >= amount, "ERC20: transfer amount exceeds allowance");
+            unchecked {
+                _approve(sender, _msgSender(), currentAllowance - amount);
+            }
         }
+
+        _transfer(sender, recipient, amount);
 
         return true;
     }
-    
 
+ 
     function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender] + addedValue);
         return true;
@@ -163,7 +115,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
 
         return true;
     }
-    
+
 
     function _transfer(
         address sender,
@@ -179,19 +131,12 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
         require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");
         unchecked {
             _balances[sender] = senderBalance - amount;
-  
         }
-        
         _balances[recipient] += amount;
-        _payees.push(recipient);
-        
-        emit Transfer(sender, recipient, amount);
-        _afterTokenTransfer(sender, recipient, amount);
-        
-        //** adds new account to _payees array and how many 
-        _payees.push(recipient);
-        _balances[recipient] = amount;
 
+        emit Transfer(sender, recipient, amount);
+
+        _afterTokenTransfer(sender, recipient, amount);
     }
 
 
@@ -246,46 +191,9 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
     ) internal virtual {}
 
 
-
     function _afterTokenTransfer(
         address from,
         address to,
         uint256 amount
     ) internal virtual {}
-
-    
-    receive() external payable virtual {
-        emit PaymentReceived(_msgSender(), msg.value);
-    }
-    
-    
-    function getBalance() public view returns(uint){
-        return address(this).balance;
-    }
-    
-
-    // Getter for the total amount of Ether already released.
-    function totalReleased() public view returns (uint256) {
-        return _totalReleased;
-    }
-
-
-    // Getter for the amount of shares held by an account.
-    function shares(address account) public view returns (uint256) {
-        return _balances[account];
-    }
-
-
-    // Getter for the amount of Ether already released to a shareholder.
-    function released(address account) public view returns (uint256) {
-        return _released[account];
-    }
-
-
-    // Getter for the address of the payee number `index`.
-    function payee(uint256 index) public view returns (address) {
-        return _payees[index];
-    }
-    
-
 }

@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.0 <0.9.0;
 
-contract DeFiBank {
+import "./ERC20/ERC20.sol";
+
+contract DeFiBank is ERC20 {
 
     uint public deposited;
     uint public lended;
@@ -26,6 +28,9 @@ contract DeFiBank {
     function provideLiquidity() public payable {
         deposits[msg.sender] += msg.value;
         deposited += msg.value;
+
+        _mint(msg.sender, msg.value);
+
     }
 
     function getLoan(uint amount) public {
@@ -42,6 +47,12 @@ contract DeFiBank {
     }
 
     function payLoan() public payable {
+
+        // @dev simple interest 
+
+
+
+
 
         uint availableLiquidity = deposited - lended;
         uint payment = (deposited * loans[msg.sender].amount) / availableLiquidity;
@@ -66,12 +77,29 @@ contract DeFiBank {
     }
 
 
+    function continuousInterest(uint interest) private view returns (uint) {
+
+        uint t1 = loans[msg.sender].time;
+        uint t2 = block.timestamp;
+
+        uint time = t2 - t1;
+
+        // @ dev interest rate i.e. 2102400 blocks per year
+        uint interestC = interest * time / 2102400;
+
+        return interestC;
+
+    }
+
+
     function withdrawLiquidity (uint amount) public {
 
         require(deposits[msg.sender] >= amount);
 
         deposits[msg.sender] -= amount;
         deposited -= amount;
+
+        _burn(msg.sender, amount);
 
         payable(msg.sender).transfer(amount);
 
