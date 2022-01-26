@@ -8,6 +8,8 @@ contract DeFiBank {
 
     uint public dividends;
 
+    uint256 public totalReleased;
+
 
     struct loan {
         uint amount;
@@ -18,6 +20,7 @@ contract DeFiBank {
     mapping(address => loan) public loans;
 
     mapping(address => uint256) public deposits;
+    mapping(address => uint256) private released;
 
 
     function provideLiquidity() public payable {
@@ -63,7 +66,7 @@ contract DeFiBank {
     }
 
 
-    function withdraw (uint amount) public {
+    function withdrawLiquidity (uint amount) public {
 
         require(deposits[msg.sender] >= amount);
 
@@ -73,5 +76,21 @@ contract DeFiBank {
         payable(msg.sender).transfer(amount);
 
         }
+
+
+    function withdrawEarnings () public virtual {
+        require(deposits[msg.sender] > 0, "PaymentSplitter: account has no deposits");
+
+        uint256 totalReceived = dividends + totalReleased;
+        uint256 payment = (totalReceived * deposits[msg.sender]) / deposited - released[msg.sender];
+
+        require(payment != 0, "PaymentSplitter: account is not due payment");
+
+        released[msg.sender] += payment;
+        totalReleased += payment;
+
+        payable(msg.sender).transfer(payment);
+
+    }
 
 }
