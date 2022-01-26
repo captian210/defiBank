@@ -256,10 +256,10 @@
         "Address"
       ]
     },
-    "/home/ubuntu/Desktop/defiBank/contracts/flatten.sol": {
-      "lastModificationDate": 1643201614215,
-      "contentHash": "125b659deb0a3470e567e7ee0e94bbb7",
-      "sourceName": "contracts/flatten.sol",
+    "/home/ubuntu/Desktop/defiBank/contracts/flat.sol": {
+      "lastModificationDate": 1643204263984,
+      "contentHash": "7bbe0f650653fc2c5bbc73e27f30767c",
+      "sourceName": "contracts/flat.sol",
       "solcConfig": {
         "version": "0.8.7",
         "settings": {
