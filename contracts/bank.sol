@@ -74,7 +74,7 @@ contract DeFiBank is ERC20 {
     @dev 
     
     interest is a function of available liquidity and the size 
-    of the user's loan proportional to total amount loaned out 
+    of the user's loan proportional to total amount loaned out
      
     */
     function viewLoanAmount() public view returns (uint) {

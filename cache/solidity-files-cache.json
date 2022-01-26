@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/home/ubuntu/Desktop/defiBank/contracts/bank.sol": {
-      "lastModificationDate": 1643201933957,
-      "contentHash": "8b5131c1a57e27e4236fa80840ded535",
+      "lastModificationDate": 1643206460511,
+      "contentHash": "52602b9430e5bf944c1398a8d42aebd5",
       "sourceName": "contracts/bank.sol",
       "solcConfig": {
         "version": "0.8.7",
@@ -257,8 +257,8 @@
       ]
     },
     "/home/ubuntu/Desktop/defiBank/contracts/flattened/flat.sol": {
-      "lastModificationDate": 1643204913268,
-      "contentHash": "7bbe0f650653fc2c5bbc73e27f30767c",
+      "lastModificationDate": 1643206537984,
+      "contentHash": "ff27ebe4dfd700a79be1b23ba7ab8e1d",
       "sourceName": "contracts/flattened/flat.sol",
       "solcConfig": {
         "version": "0.8.7",
