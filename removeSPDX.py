@@ -1,14 +1,17 @@
 # until hardhat flatten tast removes extra SPDX identfiers this is my quick and ditry solution
 import os
 
+os.system("npx hardhat flatten contracts/bank.sol > contracts/flattened/flatten.sol")
+
+
 bad_words = ['SPDX', 'pragma']
 
-with open('contracts/flatten.sol') as oldfile, open('contracts/flat.sol', 'w') as newfile:
+with open('contracts/flattened/flatten.sol') as oldfile, open('contracts/flattened/flat.sol', 'w') as newfile:
     for line in oldfile:
         if not any(bad_word in line for bad_word in bad_words):
             newfile.write(line)
             
-filename = "contracts/flat.sol"
+filename = "contracts/flattened/flat.sol"
 
 string = "// SPDX-License-Identifier: MIT \n pragma solidity ^0.8.0; \n"
             
@@ -21,4 +24,4 @@ def insert(originalfile,string):
     
 insert(filename,string)
 
-os.remove("contracts/flatten.sol")
+os.remove("contracts/flattened/flatten.sol")
