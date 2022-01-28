@@ -58,7 +58,7 @@ contract DeFiBank is ERC20 {
 
         // @dev simple interest 
         
-        uint payment = viewLoanAmount();
+        uint payment = calculateLoan();
 
         require(msg.value >= payment);
 
@@ -94,6 +94,27 @@ contract DeFiBank is ERC20 {
         return payment;
 
     }
+    
+    // @dev same function as above but private
+    function calculateLoan() private view returns (uint) {
+
+        uint availableLiquidity = deposited - lended;
+
+        uint _loan = loans[msg.sender].amount;
+
+        uint payment = (deposited * _loan) / availableLiquidity;
+
+        uint interest = payment - _loan;
+
+        uint interestC = continuousInterest(interest);
+
+        payment += interestC;
+
+        return payment;
+
+    }
+
+
 
     // @dev this function regulates the rate at which the interest increases
     function continuousInterest(uint interest) private view returns (uint) {
@@ -112,6 +133,8 @@ contract DeFiBank is ERC20 {
     }
 
 
+
+    // @ dev add functionality: user can send deposit tokens to another address, and withdraw liquidity using ERC20 tokens
     function withdrawLiquidity (uint amount) public {
 
         require(deposits[msg.sender] >= amount);
