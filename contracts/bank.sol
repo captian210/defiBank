@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity ^0.8.0;
 
 import "./ERC20/ERC20.sol";
 
@@ -38,7 +38,7 @@ contract DeFiBank is ERC20 {
     }
 
 
-    function getLoan(uint amount) public {
+    function getLoan(uint amount) external {
 
         require(amount <= deposited);
 
@@ -54,7 +54,7 @@ contract DeFiBank is ERC20 {
 
 
     // @dev currently loan must be paid in full
-    function payLoan() public payable {
+    function payLoan() external payable {
 
         // @dev simple interest 
         
@@ -77,7 +77,7 @@ contract DeFiBank is ERC20 {
     of the user's loan proportional to total amount loaned out
      
     */
-    function viewLoanAmount() public view returns (uint) {
+    function viewLoanAmount() external view returns (uint) {
 
         uint availableLiquidity = deposited - lended;
 
@@ -150,7 +150,7 @@ contract DeFiBank is ERC20 {
         }
 
 
-    function withdrawEarnings () public virtual {
+    function withdrawEarnings () external virtual {
 
         require(deposits[msg.sender] > 0, "PaymentSplitter: account has no deposits");
 
