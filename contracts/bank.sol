@@ -14,13 +14,21 @@ contract DeFiBank is ERC20 {
     uint256 public totalReleased;
 
 
-    struct loan {
+    // @dev events
+
+    event TotalDeposits(uint amount);
+    event TotalLended(uint amount);
+    event Deposited(address depositor, uint amount);
+    event Loaned(address debtor, uint amount);
+
+
+    struct Loan {
         uint amount;
         uint time;
     }
 
 
-    mapping(address => loan) public loans;
+    mapping(address => Loan) public loans;
 
     mapping(address => uint256) public deposits;
 
@@ -34,6 +42,10 @@ contract DeFiBank is ERC20 {
         deposited += msg.value;
 
         _mint(msg.sender, msg.value);
+
+        emit Deposited(msg.sender, msg.value);
+
+        emit TotalDeposits(deposited);
 
     }
 
@@ -49,6 +61,10 @@ contract DeFiBank is ERC20 {
         lended += amount;
 
         payable(msg.sender).transfer(amount);
+
+        emit Loaned(msg.sender, amount);
+
+        emit TotalLended(lended);
 
     }
 
@@ -67,6 +83,8 @@ contract DeFiBank is ERC20 {
         lended -= loans[msg.sender].amount;
 
         loans[msg.sender].amount -= loans[msg.sender].amount;
+
+        emit TotalLended(lended);
 
     }
 
@@ -138,6 +156,7 @@ contract DeFiBank is ERC20 {
     function withdrawLiquidity (uint amount) public {
 
         require(deposits[msg.sender] >= amount);
+        require(balanceOf(msg.sender) >= amount);
 
         deposits[msg.sender] -= amount;
 
@@ -146,6 +165,8 @@ contract DeFiBank is ERC20 {
         _burn(msg.sender, amount);
 
         payable(msg.sender).transfer(amount);
+
+        emit TotalDeposits(deposited);
 
         }
 
