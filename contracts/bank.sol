@@ -15,7 +15,6 @@ contract DeFiBank is ERC20 {
 
 
     // @dev events
-
     event TotalDeposits(uint amount);
     event TotalLended(uint amount);
     event Deposited(address depositor, uint amount);
@@ -34,7 +33,7 @@ contract DeFiBank is ERC20 {
 
     mapping(address => uint256) private released;
 
-
+    // @dev user deposits funds
     function provideLiquidity() public payable {
 
         deposits[msg.sender] += msg.value;
@@ -49,7 +48,7 @@ contract DeFiBank is ERC20 {
 
     }
 
-
+    // @dev user can get loan (currently no collateral i.e. this is for demonstration purposes)
     function getLoan(uint amount) external {
 
         require(amount <= deposited);
@@ -170,7 +169,8 @@ contract DeFiBank is ERC20 {
 
         }
 
-
+    // @dev users who provided liquidity can withdraw the interest payments proportional to how much liquidity they provided 
+    // @dev -- planned feature: depositors can only withdraw proportional to the amount of liquidity they provided & time the liquidity was deposited
     function withdrawEarnings () external virtual {
 
         require(deposits[msg.sender] > 0, "PaymentSplitter: account has no deposits");
